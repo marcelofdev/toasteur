@@ -1,4 +1,4 @@
-/* Toasteur v5.2 — paste into the Toast block's Style Sheet
+/* Toasteur v5.2: paste into the Toast block's Style Sheet
  *
  * New in v5.2:
  * - The dvh max-height is applied through @supports instead of a duplicate
@@ -247,7 +247,7 @@
 }
 
 /* The fill animates transform (scaleX) instead of width: it runs on the
-   compositor, with no layout/paint work per frame — cheaper and immune to
+   compositor, with no layout/paint work per frame, cheaper and immune to
    main-thread jank. The keyframe name is a contract with the JS
    (animationend listener); do not rename it. */
 .toasteur-progress-bar {

@@ -1,13 +1,13 @@
 /*
- * Toasteur v5.2 — Toast Notifications for OutSystems O11 / ODC
+ * Toasteur v5.2: Toast Notifications for OutSystems O11 / ODC
  * No dependencies. ES6+, no transpilation.
  *
  * Public API:
- *   Toasteur.configure(options)  — application-level configuration (call it in the Toast block's OnReady)
+ *   Toasteur.configure(options): application-level configuration (call it in the Toast block's OnReady)
  *     { theme: "tinted"|"solid", maxVisible: Number, maxQueued: Number, defaultDuration: Number,
  *       sound: Boolean, focusOnError: Boolean,
  *       labels: { success, error, info, warn, close, mute, unmute, notificationsRegion } }
- *   Toasteur.show(options)       — displays a toast
+ *   Toasteur.show(options): displays a toast
  *     { type, message, title?, position?, duration?, showProgressBar?, allowDuplicate?, onClick? }
  *   Shortcuts: Toasteur.success/error/info/warn(message, title, options)
  *
@@ -52,7 +52,7 @@
  *   mirroring the entry. Requires the matching styles in the v5 CSS.
  * - Pause on visibilitychange: when the tab stops being visible, the timers of
  *   all toasts pause (preserving the remaining time) and resume when the user
- *   returns — a toast no longer expires unread. Toasts created while the tab
+ *   returns; a toast no longer expires unread. Toasts created while the tab
  *   is in the background are born paused.
  * - Pause-reason model (hover, focus, hidden): the three pause sources are
  *   composable; the timer only resumes when no reason remains.
@@ -62,7 +62,7 @@
  *   even with keyboard focus inside the toast.
  * - Dismissal synchronized with the progress bar: when a bar exists, the toast
  *   closes on the animation's animationend (accurate, runs on the compositor),
- *   with setTimeout as fallback — removes the visible gap between the bar
+ *   with setTimeout as fallback; removes the visible gap between the bar
  *   finishing and the toast leaving when the main thread is busy.
  * - Configurable accessibility labels (configure({ labels })), with English
  *   defaults; API error messages are now in English as well. Applications in
@@ -134,7 +134,7 @@
         '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z"></path><line x1="22" y1="9" x2="16" y2="15"></line><line x1="16" y1="9" x2="22" y2="15"></line></svg>';
 
     // The per-type labels announced by screen readers (never rely on color
-    // alone) live in config.labels — see above.
+    // alone) live in config.labels; see above.
 
     /* ------------------------------------------------------------------ */
     /* Sound (Web Audio API, no audio files)                                */
@@ -361,7 +361,7 @@
     /*
      * Pause reasons per toast: "hover", "focus" and "hidden" (tab in the
      * background). The timer pauses when the first reason enters and only
-     * resumes when the last one leaves — hover and visibilitychange do not
+     * resumes when the last one leaves; hover and visibilitychange do not
      * trample each other. The toasteur-paused class also pauses the progress
      * bar (animation-play-state in the CSS), keeping everything in sync.
      */
@@ -389,7 +389,7 @@
 
     // Distinguishes keyboard focus (Tab) from focus left behind by a mouse
     // click: only the former should pause the toast (WCAG, timed content).
-    // A click focuses the button but without :focus-visible — pausing in that
+    // A click focuses the button but without :focus-visible; pausing in that
     // case would leave the toast frozen after the mouse leaves, until focus
     // moved somewhere else on the page.
     function isKeyboardFocus(el) {
@@ -464,7 +464,7 @@
         activeRecords.delete(record);
 
         // If keyboard focus is still inside this toast, return it to where it
-        // was before the toast took it — otherwise removing the element would
+        // was before the toast took it; otherwise removing the element would
         // drop focus on <body> and a keyboard user would lose their place.
         if (record.previousFocus && record.element.contains(document.activeElement)) {
             try {
@@ -517,7 +517,7 @@
             }
         } else {
             // Promoted to persistent (duration <= 0): drop the timer, the
-            // active-record tracking and the progress bar — otherwise the old
+            // active-record tracking and the progress bar; otherwise the old
             // bar would keep animating and its animationend would dismiss a
             // toast that is now meant to stay until closed manually.
             record.timer = null;
@@ -640,7 +640,7 @@
                 // busy. When the bar finishes, dismiss immediately; the timer
                 // remains as fallback (and is the only mechanism when there is
                 // no bar). dismiss is idempotent, so both firing has no double
-                // effect. Guard: never dismiss from animationend while paused —
+                // effect. Guard: never dismiss from animationend while paused;
                 // a bar clock that drifted while the tab was hidden must not
                 // close a toast whose timer still holds remaining time.
                 progress.bar.addEventListener("animationend", function (event) {
@@ -695,7 +695,7 @@
         container.appendChild(toast);
 
         // The timer starts after the toast is inserted into the DOM, which is
-        // when the bar's animation actually begins — minimizing drift between
+        // when the bar's animation actually begins; minimizing drift between
         // the two. A toast created while the tab is in the background is born
         // paused and only starts counting when visibility returns.
         if (record.timer) {
@@ -710,10 +710,10 @@
 
         // Keyboard focus (opt-in, config.focusOnError): only error toasts move
         // focus to their close button, and only when the application enables
-        // it — moving focus without a user request is a change of context
+        // it; moving focus without a user request is a change of context
         // (WCAG 3.2), and the assertive announcement already reaches
         // screen-reader users. success/info/warn never take focus.
-        // Guard: never steal focus from active typing — if the user is inside
+        // Guard: never steal focus from active typing; if the user is inside
         // an input, textarea, select or contenteditable, yanking focus away
         // mid-keystroke would be worse than the problem this solves. The
         // previously focused element is saved so dismiss() can return focus
@@ -882,7 +882,7 @@
             }
         }
 
-        // Visible limit: the excess goes to the queue — deduplicated (an
+        // Visible limit: the excess goes to the queue, deduplicated (an
         // identical message already waiting is not queued twice) and bounded
         // (maxQueued per position), so a toast raised in a loop cannot flood
         // the screen for minutes after the burst.
