@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toasteur Playground</title>
+<meta name="description" content="Accessible, dependency-free toast notifications for OutSystems O11 and ODC. Live playground.">
+<link rel="stylesheet" href="toasteur.css">
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --border: #e3e8ef;
+    --text: #1f2937;
+    --muted: #5b6573;
+    --accent: #1c4ed8;
+    --accent-soft: #e8eefc;
+    --code-bg: #0f172a;
+    --code-text: #e2e8f0;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  header.top {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  header.top .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; min-height: 60px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #fbbf24;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  nav.links { display: flex; gap: 6px; flex-wrap: wrap; }
+  nav.links a {
+    text-decoration: none; color: var(--text); font-size: 14px;
+    padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
+  }
+  nav.links a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero { padding: 36px 0 20px; }
+  .hero h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 34px); line-height: 1.2; }
+  .hero p { margin: 0; color: var(--muted); max-width: 720px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding: 0; list-style: none; }
+  .pills li {
+    font-size: 13px; padding: 4px 10px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent); font-weight: 600;
+  }
+
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); margin-bottom: 16px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; min-width: 0;
+  }
+  .card h2 { margin: 0 0 4px; font-size: 18px; }
+  .card > p.lead { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+
+  .quick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  button {
+    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid transparent;
+    padding: 9px 14px; font-weight: 600;
+  }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  .btn-success { background: #2f9e44; color: #fff; }
+  .btn-error   { background: #dc3545; color: #fff; }
+  .btn-info    { background: #1c7ed6; color: #fff; }
+  .btn-warn    { background: #f0ad1e; color: #1a1a1a; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-ghost   { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  form.builder { display: grid; gap: 12px; }
+  .row { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  label.field { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
+  label.field span.hint { font-weight: 400; color: var(--muted); }
+  input[type=text], input[type=number], select, textarea {
+    font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--surface); color: var(--text); width: 100%;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
+  .checks label { display: inline-flex; align-items: center; gap: 6px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .result { font-size: 13px; color: var(--muted); }
+  .result.bad { color: #b42318; }
+
+  pre.code {
+    margin: 12px 0 0; background: var(--code-bg); color: var(--code-text);
+    border-radius: 8px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5;
+    overflow-x: auto; white-space: pre;
+  }
+  .code-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 14px; text-transform: uppercase; letter-spacing: .04em; }
+
+  .scenarios { display: grid; gap: 10px; }
+  .scenario {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center;
+    padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px;
+  }
+  .scenario strong { display: block; font-size: 14px; }
+  .scenario span { color: var(--muted); font-size: 13px; }
+
+  table.compare { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.compare th, table.compare td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.compare th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .table-scroll { overflow-x: auto; }
+
+  footer { padding: 24px 0 40px; color: var(--muted); font-size: 13px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; }
+
+  @media (max-width: 560px) {
+    .row, .quick { grid-template-columns: 1fr; }
+    .scenario { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a6 6 0 0 0-6 6v3.6L4.3 15a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 11.6V8a6 6 0 0 0-6-6Zm0 20a3 3 0 0 0 2.8-2H9.2A3 3 0 0 0 12 22Z"/></svg>
+      </span>
+      Toasteur
+    </div>
+    <nav class="links" aria-label="Project links">
+      <a href="https://github.com/marcelofdev/toasteur">GitHub</a>
+      <a href="https://marcelo-ferreira72.outsystemscloud.com/CustomToastNotificationDEMO/">OutSystems demo</a>
+      <a href="https://www.outsystems.com/forge/component-overview/25143/customtoastnotification-o11">Forge O11</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Accessible toast notifications for OutSystems</h1>
+    <p>Toasteur is the engine behind the CustomToastNotification component for OutSystems O11 and ODC. It is plain JavaScript and CSS with no dependencies, so this page runs the exact same files the component ships.</p>
+    <ul class="pills">
+      <li>Screen-reader announcements</li>
+      <li>No focus stealing</li>
+      <li>Pause on hover, focus, hidden tab</li>
+      <li>Bounded queue</li>
+      <li>Deduplication</li>
+      <li>Zero dependencies</li>
+    </ul>
+  </section>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="quick-title">
+      <h2 id="quick-title">Quick launch</h2>
+      <p class="lead">One click per type, with the application defaults.</p>
+      <div class="quick">
+        <button class="btn-success" data-quick="success">Success</button>
+        <button class="btn-error" data-quick="error">Error</button>
+        <button class="btn-info" data-quick="info">Info</button>
+        <button class="btn-warn" data-quick="warn">Warning</button>
+      </div>
+
+      <h2 style="margin-top:22px">Application settings</h2>
+      <p class="lead">In OutSystems these are inputs of the ToastNotification block, applied once in its OnReady.</p>
+      <form class="builder" id="settings" onsubmit="return false">
+        <div class="row">
+          <label class="field">Theme
+            <select name="theme">
+              <option value="tinted">tinted (default)</option>
+              <option value="solid">solid</option>
+            </select>
+          </label>
+          <label class="field">DefaultDuration <span class="hint">milliseconds</span>
+            <input type="number" name="defaultDuration" value="4000" min="0" step="500">
+          </label>
+        </div>
+        <div class="row">
+          <label class="field">MaxVisible <span class="hint">per position</span>
+            <input type="number" name="maxVisible" value="5" min="1" max="20">
+          </label>
+          <label class="field">MaxQueued <span class="hint">per position</span>
+            <input type="number" name="maxQueued" value="20" min="0" max="200">
+          </label>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" name="sound"> EnableSound</label>
+          <label><input type="checkbox" name="focusOnError"> FocusOnError</label>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="builder-title">
+      <h2 id="builder-title">Build a toast</h2>
+      <p class="lead">Every ShowToast input. The code below updates as you change them.</p>
+      <form class="builder" id="builder">
+        <div class="row">
+          <label class="field">Type
+            <select name="type">
+              <option value="success">Success</option>
+              <option value="error">Error</option>
+              <option value="info" selected>Info</option>
+              <option value="warn">Warning</option>
+            </select>
+          </label>
+          <label class="field">Position
+            <select name="position">
+              <option value="top-right">top-right (default)</option>
+              <option value="top-left">top-left</option>
+              <option value="top-center">top-center</option>
+              <option value="bottom-right">bottom-right</option>
+              <option value="bottom-left">bottom-left</option>
+            </select>
+          </label>
+        </div>
+        <label class="field">Title <span class="hint">optional</span>
+          <input type="text" name="title" value="Heads up">
+        </label>
+        <label class="field">Message
+          <textarea name="message">Your report is being generated. You can keep working.</textarea>
+        </label>
+        <label class="field">Duration <span class="hint">milliseconds, empty = DefaultDuration, 0 = until closed</span>
+          <input type="number" name="duration" min="0" step="500" placeholder="DefaultDuration">
+        </label>
+        <div class="checks">
+          <label><input type="checkbox" name="showProgressBar" checked> ShowProgressBar</label>
+          <label><input type="checkbox" name="allowDuplicate"> AllowDuplicate</label>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn-primary">Show toast</button>
+          <span class="result" id="result" role="status"></span>
+        </div>
+      </form>
+      <div class="code-label">OutSystems</div>
+      <pre class="code" id="code-os"></pre>
+      <div class="code-label">JavaScript</div>
+      <pre class="code" id="code-js"></pre>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="scenarios-title" style="margin-bottom:16px">
+    <h2 id="scenarios-title">Behavior scenarios</h2>
+    <p class="lead">The cases that usually break toast libraries.</p>
+    <div class="scenarios">
+      <div class="scenario">
+        <div><strong>Deduplication</strong><span>Click repeatedly. The same message reinforces one toast with a counter instead of stacking copies, and it is announced again.</span></div>
+        <button class="btn-ghost" data-scenario="dedup">Try it</button>
+      </div>
+      <div class="scenario">
+        <div><strong>Queue</strong><span>Fires 8 different toasts. Only MaxVisible show at once; the rest enter as others close.</span></div>
+        <button class="btn-ghost" data-scenario="queue">Try it</button>
+      </div>
+      <div class="scenario">
+        <div><strong>Error in a loop</strong><span>Fires 60 different errors at once. The queue is bounded by MaxQueued, so the excess is dropped with a console warning instead of flooding the screen for minutes.</span></div>
+        <button class="btn-ghost" data-scenario="flood">Try it</button>
+      </div>
+      <div class="scenario">
+        <div><strong>Persistent</strong><span>Stays until you close it. No auto-dismiss, no progress bar.</span></div>
+        <button class="btn-ghost" data-scenario="persistent">Try it</button>
+      </div>
+      <div class="scenario">
+        <div><strong>Tab switch</strong><span>Click, switch to another tab, come back later. The timer paused while the tab was hidden and the toast is still there.</span></div>
+        <button class="btn-ghost" data-scenario="tab">Try it</button>
+      </div>
+      <div class="scenario">
+        <div><strong>Clickable toast</strong><span>A toast with an action. Reachable with Tab and activated with Enter or Space, not only with the mouse.</span></div>
+        <button class="btn-ghost" data-scenario="clickable">Try it</button>
+      </div>
+      <div class="scenario">
+        <div><strong>Sound</strong><span>One toast of each type, each with its own tone. Turns EnableSound on. Use the speaker button on a toast to mute the session.</span></div>
+        <button class="btn-ghost" data-scenario="sound">Try it</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="compare-title">
+    <h2 id="compare-title">Compared to the platform FeedbackMessage</h2>
+    <p class="lead">What changes when you replace it.</p>
+    <div class="table-scroll">
+      <table class="compare">
+        <thead><tr><th scope="col"></th><th scope="col">FeedbackMessage</th><th scope="col">Toasteur</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Several messages at once</th><td>One at a time, the next replaces the previous</td><td>Stack per position, bounded queue</td></tr>
+          <tr><th scope="row">Repeated message</th><td>Shown again</td><td>Merged, with a counter</td></tr>
+          <tr><th scope="row">Screen-reader announcement</th><td>Depends on the theme markup</td><td>Persistent polite and assertive live regions</td></tr>
+          <tr><th scope="row">Pause on hover, focus, hidden tab</th><td>No</td><td>Yes</td></tr>
+          <tr><th scope="row">Stays until closed</th><td>No</td><td>Duration = 0</td></tr>
+          <tr><th scope="row">Sound</th><td>No</td><td>Optional, per type, mutable</td></tr>
+          <tr><th scope="row">Localizable accessibility labels</th><td>No</td><td>8 inputs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Toasteur v5.2, MIT License. Built by Marcelo Ferreira.</span>
+    <span><a href="https://github.com/marcelofdev/toasteur">Source on GitHub</a></span>
+  </div>
+</footer>
+
+<script src="toasteur.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var settingsForm = document.getElementById("settings");
+  var builderForm = document.getElementById("builder");
+  var resultEl = document.getElementById("result");
+  var codeOs = document.getElementById("code-os");
+  var codeJs = document.getElementById("code-js");
+
+  var TYPE_ENTITY = { success: "Success", error: "Error", info: "Info", warn: "Warning" };
+  var QUICK = {
+    success: { title: "Saved", message: "Your changes have been saved." },
+    error:   { title: "Error", message: "Unable to process your request. Please try again." },
+    info:    { title: "Information", message: "A new version of this page is available." },
+    warn:    { title: "Warning", message: "Your session expires in 5 minutes." }
+  };
+
+  function applySettings() {
+    var f = settingsForm.elements;
+    Toasteur.configure({
+      theme: f.theme.value,
+      defaultDuration: Number(f.defaultDuration.value),
+      maxVisible: Number(f.maxVisible.value),
+      maxQueued: Number(f.maxQueued.value),
+      sound: f.sound.checked,
+      focusOnError: f.focusOnError.checked
+    });
+  }
+
+  // ShowToast in OutSystems never throws: it returns IsSuccess and ErrorMessage.
+  function showToast(options) {
+    try {
+      Toasteur.show(options);
+      return { isSuccess: true, errorMessage: "" };
+    } catch (e) {
+      return { isSuccess: false, errorMessage: e.message };
+    }
+  }
+
+  function readBuilder() {
+    var f = builderForm.elements;
+    var duration = f.duration.value.trim();
+    return {
+      type: f.type.value,
+      title: f.title.value,
+      message: f.message.value,
+      position: f.position.value,
+      duration: duration === "" ? undefined : Number(duration),
+      showProgressBar: f.showProgressBar.checked,
+      allowDuplicate: f.allowDuplicate.checked
+    };
+  }
+
+  function osString(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
+  function jsString(s) { return JSON.stringify(String(s)); }
+
+  function renderCode() {
+    var o = readBuilder();
+    var os = [
+      "ShowToast(",
+      "    Message = " + osString(o.message) + ",",
+      "    Type = Entities.Toast_Type." + TYPE_ENTITY[o.type] + ","
+    ];
+    if (o.title) os.push("    Title = " + osString(o.title) + ",");
+    if (o.duration !== undefined) os.push("    Duration = " + o.duration + ",");
+    if (o.position !== "top-right") os.push("    Position = Entities.Toast_Position." + o.position.split("-").map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join("") + ",");
+    if (!o.showProgressBar) os.push("    ShowProgressBar = False,");
+    if (o.allowDuplicate) os.push("    AllowDuplicate = True,");
+    os[os.length - 1] = os[os.length - 1].replace(/,$/, "");
+    os.push(")");
+    codeOs.textContent = os.join("\n");
+
+    var js = ["Toasteur.show({", "    type: " + jsString(o.type) + ",", "    message: " + jsString(o.message) + ","];
+    if (o.title) js.push("    title: " + jsString(o.title) + ",");
+    if (o.duration !== undefined) js.push("    duration: " + o.duration + ",");
+    if (o.position !== "top-right") js.push("    position: " + jsString(o.position) + ",");
+    if (!o.showProgressBar) js.push("    showProgressBar: false,");
+    if (o.allowDuplicate) js.push("    allowDuplicate: true,");
+    js[js.length - 1] = js[js.length - 1].replace(/,$/, "");
+    js.push("});");
+    codeJs.textContent = js.join("\n");
+  }
+
+  settingsForm.addEventListener("change", applySettings);
+  builderForm.addEventListener("input", renderCode);
+  builderForm.addEventListener("change", renderCode);
+  builderForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = showToast(readBuilder());
+    resultEl.textContent = r.isSuccess ? "IsSuccess = True" : "IsSuccess = False, ErrorMessage = " + r.errorMessage;
+    resultEl.classList.toggle("bad", !r.isSuccess);
+  });
+
+  document.querySelectorAll("[data-quick]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var type = btn.getAttribute("data-quick");
+      showToast({ type: type, title: QUICK[type].title, message: QUICK[type].message });
+    });
+  });
+
+  var scenarios = {
+    dedup: function () {
+      showToast({ type: "success", title: "Saved", message: "Draft saved automatically." });
+    },
+    queue: function () {
+      for (var i = 1; i <= 8; i++) {
+        showToast({ type: "info", title: "Queue", message: "Toast " + i + " of 8.", duration: 3000 });
+      }
+    },
+    flood: function () {
+      for (var i = 1; i <= 60; i++) {
+        showToast({ type: "error", title: "Sync failed", message: "Record " + i + " could not be synchronized.", duration: 2500 });
+      }
+      resultEl.textContent = "";
+    },
+    persistent: function () {
+      showToast({ type: "error", title: "Persistent", message: "This toast stays until you close it.", duration: 0 });
+    },
+    tab: function () {
+      showToast({ type: "info", title: "Tab switch", message: "Switch to another tab now and come back. The timer pauses while this tab is hidden.", duration: 8000 });
+    },
+    clickable: function () {
+      showToast({
+        type: "info",
+        title: "New message",
+        message: "Click this toast, or press Enter while it has focus, to open it.",
+        duration: 8000,
+        onClick: function () {
+          showToast({ type: "success", title: "Opened", message: "The toast action ran." });
+        }
+      });
+    },
+    sound: function () {
+      settingsForm.elements.sound.checked = true;
+      applySettings();
+      ["success", "error", "info", "warn"].forEach(function (type, i) {
+        setTimeout(function () {
+          showToast({ type: type, title: QUICK[type].title, message: QUICK[type].message });
+        }, i * 700);
+      });
+    }
+  };
+
+  document.querySelectorAll("[data-scenario]").forEach(function (btn) {
+    btn.addEventListener("click", function () { scenarios[btn.getAttribute("data-scenario")](); });
+  });
+
+  applySettings();
+  renderCode();
+})();
+</script>
+</body>
+</html>

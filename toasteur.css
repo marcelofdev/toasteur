@@ -1,0 +1,373 @@
+/* Toasteur v5.2 — paste into the Toast block's Style Sheet
+ *
+ * New in v5.2:
+ * - The dvh max-height is applied through @supports instead of a duplicate
+ *   max-height declaration: same fallback behavior, no linter warning.
+ *
+ * New in v5.1:
+ * - Configurable top offset via --toasteur-top-offset (defaults to 0), so a
+ *   consumer application with a fixed header can prevent the container from
+ *   overlapping it, without editing this file.
+ * - Larger close/mute hit area (26px -> 32px), easier to hit accurately,
+ *   especially on touch.
+ * - Explicit extra spacing between the mute and close buttons, so they are
+ *   harder to mix up.
+ */
+
+.toasteur-container {
+    --toasteur-exit: 300ms; /* keep aligned with EXIT_ANIMATION_MS in the JS */
+    --toasteur-top-offset: 0px; /* override in the consumer app's theme if a fixed header overlaps the container */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(100vh - var(--toasteur-top-offset)); /* dvh override below, for browsers that support it */
+    overflow: hidden;
+    padding: 20px;
+    pointer-events: none;
+    position: fixed;
+    width: 400px;
+    max-width: 100%;
+    z-index: 100000;
+}
+
+/* dvh accounts for the mobile browser UI (address bar). Feature-detected
+   instead of a duplicate declaration, so older browsers keep the vh value
+   above and linters don't flag a duplicate property. */
+@supports (height: 100dvh) {
+    .toasteur-container {
+        max-height: calc(100dvh - var(--toasteur-top-offset));
+    }
+}
+
+.toasteur-container *,
+.toasteur-container *::before,
+.toasteur-container *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Positions */
+.toasteur-container.top-right    { top: var(--toasteur-top-offset); right: 0; }
+.toasteur-container.top-left     { top: var(--toasteur-top-offset); left: 0; }
+.toasteur-container.top-center   { top: var(--toasteur-top-offset); left: 50%; transform: translateX(-50%); }
+.toasteur-container.bottom-right { bottom: 0; right: 0; flex-direction: column-reverse; }
+.toasteur-container.bottom-left  { bottom: 0; left: 0; flex-direction: column-reverse; }
+
+/* Toast base (shared by both themes) */
+.toasteur-notification {
+    align-items: flex-start;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+    display: flex;
+    font-family: inherit;
+    gap: 12px;
+    overflow: hidden;
+    padding: 13px 14px;
+    pointer-events: all;
+    position: relative;
+    width: 100%;
+}
+
+.toasteur-notification.toasteur-clickable {
+    cursor: pointer;
+}
+
+/* Per-type accents (shared by both themes) */
+.toasteur-notification.success { --toasteur-accent: #2f9e44; --toasteur-tint: #ebf7ee; }
+.toasteur-notification.error   { --toasteur-accent: #dc3545; --toasteur-tint: #fdedef; }
+.toasteur-notification.info    { --toasteur-accent: #1c7ed6; --toasteur-tint: #e9f2fc; }
+.toasteur-notification.warn    { --toasteur-accent: #b07d0a; --toasteur-tint: #fdf6e3; }
+
+/* ------------------------------------------------------------------ */
+/* TINTED theme (default): tinted surface, side accent                  */
+/* ------------------------------------------------------------------ */
+
+.toasteur-notification.toasteur-theme-tinted {
+    background-color: var(--toasteur-tint);
+    border: 1px solid color-mix(in srgb, var(--toasteur-accent) 35%, transparent);
+    border-left: 4px solid var(--toasteur-accent);
+    color: #1f2937;
+}
+
+.toasteur-theme-tinted .toasteur-icon { color: var(--toasteur-accent); }
+.toasteur-theme-tinted .toasteur-title { color: #111827; }
+.toasteur-theme-tinted .toasteur-content { color: #374151; }
+
+.toasteur-theme-tinted .toasteur-close,
+.toasteur-theme-tinted .toasteur-mute { color: #6b7280; }
+.toasteur-theme-tinted .toasteur-close:hover,
+.toasteur-theme-tinted .toasteur-mute:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+    color: #1f2937;
+}
+
+.toasteur-theme-tinted .toasteur-count {
+    background-color: var(--toasteur-accent);
+    color: #fff;
+}
+
+.toasteur-theme-tinted .toasteur-progress {
+    background-color: color-mix(in srgb, var(--toasteur-accent) 15%, transparent);
+}
+.toasteur-theme-tinted .toasteur-progress-bar {
+    background-color: var(--toasteur-accent);
+}
+
+/* ------------------------------------------------------------------ */
+/* SOLID theme: solid background in the type color                      */
+/* ------------------------------------------------------------------ */
+
+.toasteur-notification.toasteur-theme-solid {
+    background-color: var(--toasteur-accent);
+    border: none;
+    color: #fff;
+}
+
+/* solid warn: yellow requires dark text to keep contrast */
+.toasteur-notification.toasteur-theme-solid.warn {
+    --toasteur-accent: #f0ad1e;
+    color: #1a1a1a;
+}
+
+.toasteur-theme-solid .toasteur-icon,
+.toasteur-theme-solid .toasteur-title,
+.toasteur-theme-solid .toasteur-content,
+.toasteur-theme-solid .toasteur-close,
+.toasteur-theme-solid .toasteur-mute {
+    color: inherit;
+}
+
+.toasteur-theme-solid .toasteur-close:hover,
+.toasteur-theme-solid .toasteur-mute:hover {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.toasteur-theme-solid .toasteur-count {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #1f2937;
+}
+.toasteur-notification.toasteur-theme-solid.warn .toasteur-count {
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+}
+
+.toasteur-theme-solid .toasteur-progress {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+.toasteur-theme-solid .toasteur-progress-bar {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+.toasteur-notification.toasteur-theme-solid.warn .toasteur-progress-bar {
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared elements                                                      */
+/* ------------------------------------------------------------------ */
+
+.toasteur-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.toasteur-text-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.toasteur-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+}
+
+.toasteur-content {
+    font-size: 13.5px;
+    line-height: 1.45;
+    overflow-wrap: break-word;
+    /* text is intentionally selectable: lets users copy error messages */
+}
+
+.toasteur-count {
+    border-radius: 999px;
+    display: none;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    margin-top: 2px;
+    padding: 4px 7px;
+}
+
+.toasteur-count.toasteur-count-visible {
+    display: inline-block;
+}
+
+.toasteur-close,
+.toasteur-mute {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    justify-content: center;
+    min-height: 32px;
+    min-width: 32px;
+    padding: 4px;
+}
+
+/* Extra breathing room between mute and close specifically, on top of the
+   toast's base gap, so the two are harder to mix up on touch or with
+   reduced dexterity. */
+.toasteur-mute + .toasteur-close {
+    margin-left: 4px;
+}
+
+.toasteur-close:focus-visible,
+.toasteur-mute:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.toasteur-progress {
+    bottom: 0;
+    height: 3px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
+/* The fill animates transform (scaleX) instead of width: it runs on the
+   compositor, with no layout/paint work per frame — cheaper and immune to
+   main-thread jank. The keyframe name is a contract with the JS
+   (animationend listener); do not rename it. */
+.toasteur-progress-bar {
+    animation-fill-mode: forwards;
+    animation-name: toasteur-progress;
+    animation-timing-function: linear;
+    height: 100%;
+    transform-origin: left;
+    width: 100%;
+}
+
+.toasteur-notification.toasteur-paused .toasteur-progress-bar {
+    animation-play-state: paused;
+}
+
+@keyframes toasteur-progress {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+}
+
+/* Screen readers only */
+.toasteur-sr-only {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+/* Directional entry.
+   The container part is wrapped in :where() so it adds no specificity:
+   the entry rules stay at (0,1,0), letting the deduplication pulse
+   (0,2,0) and the prefers-reduced-motion overrides (0,2,0) win the
+   cascade for the animation property. */
+:where(.toasteur-container.top-right, .toasteur-container.bottom-right) .toasteur-notification {
+    animation: toasteur-enter-right 0.3s ease forwards;
+}
+
+:where(.toasteur-container.top-left, .toasteur-container.bottom-left) .toasteur-notification {
+    animation: toasteur-enter-left 0.3s ease forwards;
+}
+
+:where(.toasteur-container.top-center) .toasteur-notification {
+    animation: toasteur-enter-top 0.3s ease forwards;
+}
+
+@keyframes toasteur-enter-right {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toasteur-enter-left {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toasteur-enter-top {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Directional exit. Same :where() rationale as the entry rules: these stay
+   at (0,2,0) so the reduced-motion override (same specificity, declared
+   later in the file) wins by source order. */
+.toasteur-notification.toasteur-exit {
+    opacity: 0;
+    transition: opacity var(--toasteur-exit) ease, transform var(--toasteur-exit) ease;
+}
+
+:where(.toasteur-container.top-right, .toasteur-container.bottom-right) .toasteur-notification.toasteur-exit {
+    transform: translateX(24px);
+}
+
+:where(.toasteur-container.top-left, .toasteur-container.bottom-left) .toasteur-notification.toasteur-exit {
+    transform: translateX(-24px);
+}
+
+:where(.toasteur-container.top-center) .toasteur-notification.toasteur-exit {
+    transform: translateY(-24px);
+}
+
+/* Deduplication pulse */
+.toasteur-notification.toasteur-pulse {
+    animation: toasteur-pulse 0.4s ease;
+}
+
+@keyframes toasteur-pulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .toasteur-container .toasteur-notification {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+    .toasteur-notification.toasteur-exit {
+        transition: opacity 0.01s;
+        transform: none;
+    }
+    .toasteur-notification.toasteur-pulse {
+        animation: none;
+    }
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+    .toasteur-container {
+        padding: 10px;
+        width: 100%;
+    }
+    .toasteur-container.top-center {
+        left: 0;
+        transform: none;
+    }
+}
